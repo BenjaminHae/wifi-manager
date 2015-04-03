@@ -21,19 +21,26 @@ class DB():
     def __init__(self, path):
         self.path = path
     
-    def getData(self, path=''):
-        if path == '':
-            path = self.path
-        with open(path, 'rU') as data:
+    def getData(self):
+        with open(self.path, 'rU') as data:
             data.readline()
             reader = csv.reader(data)
             for row in map(wifiRecord._make, reader):
                 yield row
     
-    def filteredData(self,expression, path=''):
+    def filteredData(self,expression):
         for wifi in self.getData(path):
             if wifiRecordContains(wifi, expression):
                 yield wifi
+
+    def addItem(self, wifi):
+        pass
+    
+    def removeItem(self, wifi):
+        pass
+
+    def changeItem(self, old, new):
+        pass
 
 if __name__=='__main__':
     db = DB('list.csv')
