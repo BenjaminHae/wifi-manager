@@ -49,7 +49,7 @@ def connectWifi(ssid, encryption, passphrase):
                 "security": "802-11-wireless-security",
             },
             "802-11-wireless-security": {
-                "key-mgmt": "wpa-psk", # Encryption Type
+                "key-mgmt": "wpa-psk", # Encryption Type: wpa-psk, 
                 "psk": passphrase
             },
         }
