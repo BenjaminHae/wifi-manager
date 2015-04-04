@@ -8,12 +8,11 @@ import argparse
 
 def parseArgs():
     parser = argparse.ArgumentParser(description='Manage list of wifi networks')
-    parser.add_argument('--filter', action='store', help='search for WIFI network')
+    parser.add_argument('--filter', metavar='expression', action='store', help='search for WIFI network')
     parser.add_argument('--path', action='store', help='use file as database')
-    parser.add_argument('--connect', action='store', help='connect to first network in list')
+    parser.add_argument('--connect', metavar='id', type=int, action='store', help='connect to first network in list')
     parser.add_argument('--add', action='store_true', help='add network')
-    parser.add_argument('--remove', action='store', help='remove all found entries')
-    parser.add_argument('--replace', action='store', help='replace network')
+    parser.add_argument('--remove', metavar='id', type=int, action='store', help='remove all found entries')
     parser.add_argument('--parse-add', action='store', help='add multiple networks by parsing standard input')
     args = parser.parse_args()
     return args
@@ -25,22 +24,25 @@ def main():
         path = args.path
     db = database.DB(path)
     if args.add == True:
-        addWifi(db) 
+        db.addItem(addWifi())
     if args.filter != None:
         data = db.filteredData(args.filter)
     else:
         data = db.getData()
-
-    #palette = [('entry', 'default,bold', 'default')]
-    #urwid.MainLoop(Table((formatWifiGen((data)))), palette).run()
-    # start display
-    minWidth = [15 for i in range(0,5)]
-    minWidth[0] = 2
+    if args.connect != None:
+        connect(data, args.connect)
+        print("Connecting to "+str(args.connect))
+    minWidth = getColumnWidth()
     id = 0
     for wifi in data:
         id += 1
         print(formatWifi(id, wifi, minWidth))
         
+def getColumnWidth():
+    minWidth = [15 for i in range(0,5)]
+    minWidth[0] = 2
+    return minWidth
+
 def fillWidth(strings, minWidth):
     if minWidth == None:
         return strings
@@ -52,8 +54,16 @@ def fillWidth(strings, minWidth):
 def formatWifi(id, wifi, minWidth = None):
     return ' | '.join(fillWidth([str(id), wifi.name, wifi.ssid, wifi.location, wifi.comment],minWidth))
 
-def addWifi(db):
-    pass
+def addWifi():
+    wifiInput = []
+    wifiInput.append(input("Enter connection name: "))
+    wifiInput.append(input("SSID: "))
+    wifiInput.append("wpa-psk")
+    wifiInput.append(input("Passphrase: "))
+    wifiInput.append(input("Location: "))
+    wifiInput.append("")
+    wifiInput.append(input("Comment: "))
+    return database.wifiRecord._make(wifiInput)
 
 if __name__ =='__main__':
     main()
