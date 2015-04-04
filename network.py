@@ -14,7 +14,7 @@ def connectWifi(ssid, encryption, passphrase):
         # Assuming Wireless is already enabled
         # Assuming we want wlan0
         device_path = manager.GetDeviceByIpIface("wlan0")
-        print "wlan0 path: ", device_path
+        print("wlan0 path: ", device_path)
          # Connect to the device's Wireless interface and obtain list of access
         # points.
         device = dbus.Interface(bus.get_object("org.freedesktop.NetworkManager",
@@ -34,14 +34,14 @@ def connectWifi(ssid, encryption, passphrase):
             # Returned SSID is a list of ASCII values. Let's convert it to a proper
             # string.
             str_ap_ssid = "".join(chr(i) for i in ap_ssid)
-            print ap_path, ": SSID =", str_ap_ssid
+            print(ap_path, ": SSID =", str_ap_ssid)
             if str_ap_ssid == ssid:
                 our_ap_path = ap_path
                 break
         if not our_ap_path:
-          print "AP not found :("
+          print("AP not found :(")
           exit(2)
-        print "Our AP: ", our_ap_path
+        print("Our AP: ", our_ap_path)
         # At this point we have all the data we need. Let's prepare our connection
         # parameters so that we can tell the NetworkManager what is the passphrase.
         connection_params = {
@@ -56,8 +56,8 @@ def connectWifi(ssid, encryption, passphrase):
         # Establish the connection.
         settings_path, connection_path = manager.AddAndActivateConnection(
             connection_params, device_path, our_ap_path)
-        print "settings_path =", settings_path
-        print "connection_path =", connection_path
+        print("settings_path =", settings_path)
+        print("connection_path =", connection_path)
         # Connect
         connection_props = dbus.Interface(
           bus.get_object("org.freedesktop.NetworkManager", connection_path),
