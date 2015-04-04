@@ -29,7 +29,7 @@ class DB():
                 yield row
     
     def filteredData(self,expression):
-        for wifi in self.getData(path):
+        for wifi in self.getData():
             if wifiRecordContains(wifi, expression):
                 yield wifi
 
