@@ -1,35 +1,49 @@
 #!/usr/bin/python3
 from curses import wrapper
-import curses
-import csv
+import database
+import network
+import argparse
+#import urwid
+#from table import Table
 
-i = 0
+def parseArgs():
+    parser = argparse.ArgumentParser(description='Manage list of wifi networks')
+    parser.add_argument('--filter', action='store', help='search for WIFI network')
+    parser.add_argument('--path', action='store', help='use file as database')
+    args = parser.parse_args()
+    return args
 
-def dataWidth(csv):
-    return 50
+def main():
+    args = parseArgs()
+    path = 'list.csv'
+    if args.path != None:
+        path = args.path
+    db = database.DB(path)
+    if args.filter != None:
+        data = db.filteredData(args.filter)
+    else:
+        data = db.getData()
 
-def dataLength(csv):
-    return 10
+    #palette = [('entry', 'default,bold', 'default')]
+    #urwid.MainLoop(Table((formatWifiGen((data)))), palette).run()
+    # start display
+    minWidth = [10 for i in range(0,4)]
+    for wifi in data:
+        print(formatWifi(wifi, minWidth))
+        
+def fillWidth(strings, minWidth):
+    if minWidth == None:
+        return strings
+    for i in range(0,min(len(minWidth),len(strings))-1):
+        newStrings[i] = strings[i]+' '*(minWidth-len(strings[i]))
+    return newStrings
 
-def dataShow(csv, add):
-    global i
-    i = i+1
-    add(i,str(i))
+def formatWifi(wifi, minWidth = None):
+    return ' | '.join(fillWidth([wifi.name,wifi.ssid,wifi.location,wifi.comment],minWidth))
 
-def main(stdscr):
-    # Clear screen
-    stdscr.clear()
-
-    csv = 0
-
-    pad = curses.newpad(dataLength(0),dataWidth(0))
-    pad.scrollok(True)
-    dataShow(csv, lambda line, data: pad.addstr(line,0,data))
-    pad.addstr(1,1,'blafnanf', curses.A_UNDERLINE)
-    pad.refresh(0,0, 0,1, curses.LINES - 1, curses.COLS - 1)
-    
-    #stdscr.refresh()
-    stdscr.getkey()
+def formatWifiGen(data):
+    for wifi in data():
+        yield formatWifi(wifi)
 
 if __name__ =='__main__':
-    wrapper(main)
+    main()
