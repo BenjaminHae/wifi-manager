@@ -3,8 +3,8 @@ from curses import wrapper
 import database
 import network
 import argparse
-import fileinput
 import sys
+import parseAdd
 
 def parseArgs():
     parser = argparse.ArgumentParser(description='Manage list of wifi networks')
@@ -32,7 +32,7 @@ def main():
             parse = sys.stdin
         else:
             parse = open(inputFile)
-        addParse(db, parse)
+        db.addItem(addParse(parse))
     if args.filter != None:
         data = db.filteredData(args.filter)
     else:
@@ -85,8 +85,8 @@ def addWifi():
     wifiInput.append(input("Comment: "))
     return database.wifiRecord._make(wifiInput)
 
-def addParse(db, parse):
-    pass
+def addParse(parse):
+    return parseAdd.parseWifi(parse)
 
 if __name__ =='__main__':
     main()
