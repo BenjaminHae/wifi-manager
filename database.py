@@ -34,12 +34,12 @@ class DB():
                 yield wifi
 
     def addItem(self, wifi):
-        pass
+        with open(self.path, 'a') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow((wifi.name, wifi.ssid, wifi.encryption, wifi.passphrase, wifi.location, wifi.latlong, wifi.comment))
+            
     
     def removeItem(self, wifi):
-        pass
-
-    def changeItem(self, old, new):
         pass
 
 if __name__=='__main__':
