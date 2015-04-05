@@ -3,8 +3,8 @@ from curses import wrapper
 import database
 import network
 import argparse
-#import urwid
-#from table import Table
+import fileinput
+import sys
 
 def parseArgs():
     parser = argparse.ArgumentParser(description='Manage list of wifi networks')
@@ -12,20 +12,27 @@ def parseArgs():
     parser.add_argument('--path', action='store', help='use file as database')
     parser.add_argument('--connect', metavar='id', type=int, action='store', help='connect to first network in list')
     parser.add_argument('--add', action='store_true', help='add network')
-    parser.add_argument('--remove', metavar='id', type=int, action='store', help='remove all found entries')
+    parser.add_argument('--remove', metavar='id', type=int, action='store', help='remove entry id')
     parser.add_argument('--parse-add', action='store', dest='inputFile', metavar='file', nargs='?', const='', type=str, help='add multiple networks by parsing standard input')
     args = parser.parse_args()
     return args
 
 def main():
     args = parseArgs()
-    print(args.inputFile)
+    
     path = 'list.csv'
     if args.path != None:
         path = args.path
     db = database.DB(path)
     if args.add == True:
         db.addItem(addWifi())
+    inputFile = args.inputFile
+    if inputFile != None:
+        if inputFile == '':
+            parse = sys.stdin
+        else:
+            parse = open(inputFile)
+        addParse(db, parse)
     if args.filter != None:
         data = db.filteredData(args.filter)
     else:
@@ -77,6 +84,9 @@ def addWifi():
     wifiInput.append("")
     wifiInput.append(input("Comment: "))
     return database.wifiRecord._make(wifiInput)
+
+def addParse(db, parse):
+    pass
 
 if __name__ =='__main__':
     main()
