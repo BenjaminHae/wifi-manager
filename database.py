@@ -33,11 +33,11 @@ class DB():
             if wifiRecordContains(wifi, expression):
                 yield wifi
 
-    def addItem(self, wifi):
+    def addItem(self, data):
         with open(self.path, 'a') as csvfile:
             writer = csv.writer(csvfile)
-            writer.writerow((wifi.name, wifi.ssid, wifi.encryption, wifi.passphrase, wifi.location, wifi.latlong, wifi.comment))
-            
+            for wifi in data:
+                writer.writerow((wifi.name, wifi.ssid, wifi.encryption, wifi.passphrase, wifi.location, wifi.latlong, wifi.comment))
     
     def removeItem(self, wifi):
         pass
