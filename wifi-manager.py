@@ -31,12 +31,24 @@ def main():
         data = db.getData()
     if args.connect != None:
         connect(data, args.connect)
-        print("Connecting to "+str(args.connect))
     minWidth = getColumnWidth()
     id = 0
     for wifi in data:
         id += 1
         print(formatWifi(id, wifi, minWidth))
+
+def connect(data, id):
+    if id == None:
+        id = 1
+    count = 0
+    for wifi in data:
+        id += 1
+        if id == count:
+            print("Connecting to "+ wifi.name)
+            network.connetWifi(wifi.ssid, wifi.encryption, wifi.passphrase)
+            return 0
+    print("Couldn't connect, id was too high")
+    return 1
         
 def getColumnWidth():
     minWidth = [15 for i in range(0,5)]
