@@ -9,11 +9,14 @@ import parseAdd
 def parseArgs():
     parser = argparse.ArgumentParser(description='Manage list of wifi networks')
     parser.add_argument('--filter', metavar='expression', action='store', help='search for WIFI network')
+    parser.add_argument('--show', action='store', help='show all information about wifi', metavar='id', type=int)
+    parser.add_argument('--bar', action='store', help='show a barcode to connect', metavar='id', type=int)# ToDo
     parser.add_argument('--path', action='store', help='use file as database')
     parser.add_argument('--connect', metavar='id', type=int, action='store', help='connect to first network in list')
     parser.add_argument('--add', action='store_true', help='add network')
-    parser.add_argument('--remove', metavar='id', type=int, action='store', help='remove entry id')
-    parser.add_argument('--parse-add', action='store_true', dest='parse', help='add multiple networks by parsing standard input or files') # const = ''
+    parser.add_argument('--remove', metavar='id', type=int, action='store', help='remove entry id')# ToDo
+    parser.add_argument('--edit', action='store', metavar='id', type=int, help='edit entry')# ToDo
+    parser.add_argument('--parse-add', action='store_true', dest='parse', help='add multiple networks by parsing standard input or files')
     parser.add_argument('inputFiles', help='files for parsing', metavar='file', nargs='*', type=str, action='store')
     args = parser.parse_args()
     return args
@@ -38,27 +41,36 @@ def main():
         data = db.filteredData(args.filter)
     else:
         data = db.getData()
+    
     if args.connect != None:
-        connect(data, args.connect)
+        connect(getWifiById(data, args.connect))
+    if args.show != None:
+        showInfo(getWifiById(data,args.show))
+
     minWidth = getColumnWidth()
     id = 0
     for wifi in data:
         id += 1
         print(formatWifi(id, wifi, minWidth))
 
-def connect(data, id):
+def getWifiById(data, id):
     if id == None:
         id = 1
     count = 0
     for wifi in data:
         count += 1
         if id == count:
-            print("Connecting to "+ wifi.name)
-            network.connectWifi(wifi.ssid, wifi.encryption, wifi.passphrase)
-            return 0
-    print("Couldn't connect, id is out of range")
-    return 1
-        
+            return wifi
+    return None
+
+def connect(wifi):
+    print("Connecting to "+ wifi.name)
+    network.connectWifi(wifi.ssid, wifi.encryption, wifi.passphrase)
+
+def showInfo(wifi):
+    for field in wifi._fields:
+        print(field + ': ' + getattr(wifi, field))
+
 def getColumnWidth():
     minWidth = [15 for i in range(0,5)]
     minWidth[0] = 2
