@@ -5,7 +5,7 @@ import database
 # parse wifi from networkManager
 # data = opened textfile
 def parseWifi(data):
-    parser = configparser.configparser()
+    parser = configparser.ConfigParser()
     parser.read_file(data)
     _misc = 'connection'
     _info = '802-11-wireless'
