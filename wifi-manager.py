@@ -13,7 +13,8 @@ def parseArgs():
     parser.add_argument('--connect', metavar='id', type=int, action='store', help='connect to first network in list')
     parser.add_argument('--add', action='store_true', help='add network')
     parser.add_argument('--remove', metavar='id', type=int, action='store', help='remove entry id')
-    parser.add_argument('--parse-add', action='store', dest='inputFile', metavar='file', nargs='?', const='', type=str, help='add multiple networks by parsing standard input')
+    parser.add_argument('--parse-add', action='store_true', dest='parse', help='add multiple networks by parsing standard input or files') # const = ''
+    parser.add_argument('inputFiles', help='files for parsing', metavar='file', nargs='*', type=str, action='store')
     args = parser.parse_args()
     return args
 
@@ -26,13 +27,13 @@ def main():
     db = database.DB(path)
     if args.add == True:
         db.addItem(addWifi())
-    inputFile = args.inputFile
-    if inputFile != None:
-        if inputFile == '':
-            parse = sys.stdin
+    if args.parse == True:
+        inputFile = args.inputFiles
+        if len(inputFile) == 0:
+            parse = [sys.stdin]
         else:
-            parse = open(inputFile)
-        db.addItem(addParse(parse))
+            parse = [open(File) for File in inputFile]
+        db.addItem(map(addParse,parse))
     if args.filter != None:
         data = db.filteredData(args.filter)
     else:
