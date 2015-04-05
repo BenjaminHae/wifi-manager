@@ -13,12 +13,13 @@ def parseArgs():
     parser.add_argument('--connect', metavar='id', type=int, action='store', help='connect to first network in list')
     parser.add_argument('--add', action='store_true', help='add network')
     parser.add_argument('--remove', metavar='id', type=int, action='store', help='remove all found entries')
-    parser.add_argument('--parse-add', action='store', help='add multiple networks by parsing standard input')
+    parser.add_argument('--parse-add', action='store', dest='inputFile', metavar='file', nargs='?', const='', type=str, help='add multiple networks by parsing standard input')
     args = parser.parse_args()
     return args
 
 def main():
     args = parseArgs()
+    print(args.inputFile)
     path = 'list.csv'
     if args.path != None:
         path = args.path
