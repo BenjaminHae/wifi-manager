@@ -50,12 +50,12 @@ def connect(data, id):
         id = 1
     count = 0
     for wifi in data:
-        id += 1
+        count += 1
         if id == count:
             print("Connecting to "+ wifi.name)
-            network.connetWifi(wifi.ssid, wifi.encryption, wifi.passphrase)
+            network.connectWifi(wifi.ssid, wifi.encryption, wifi.passphrase)
             return 0
-    print("Couldn't connect, id was too high")
+    print("Couldn't connect, id is out of range")
     return 1
         
 def getColumnWidth():
