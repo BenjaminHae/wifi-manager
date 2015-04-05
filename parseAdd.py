@@ -10,7 +10,7 @@ def parseWifi(data):
     _misc = 'connection'
     _info = '802-11-wireless'
     _security = '802-11-wireless-security'
-    wifiData = [parse.get(_misc,'id'), parse.get(_info,'ssid'), parse.get(_security,'key-mgmt'), parse.get(_security, 'psk'), '', '', '']
+    wifiData = [parser.get(_misc,'id'), parse.get(_info,'ssid'), parse.get(_security,'key-mgmt'), parse.get(_security, 'psk'), '', '', '']
     return database.wifiRecord._make(wifiData)
 
 if __name__ == '__main__':
