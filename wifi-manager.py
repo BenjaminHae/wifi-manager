@@ -4,6 +4,7 @@ import database
 import network
 import argparse
 import sys
+import os
 import parseAdd
 import readline
 #ToDo: Add Verbosity/Question befor removing
@@ -88,20 +89,24 @@ def editInfo(wifi):
     return database.wifiRecord._make(newinfo)
 
 def getColumnWidth():# ToDo use
-    minWidth = [15 for i in range(0,5)]
+    rows, columns = map(int,os.popen('stty size', 'r').read().split())
+    colWidth = (columns - 4*2 - 2)// 4 # -7 für spalten und id
+    minWidth = [colWidth for i in range(0,5)]
     minWidth[0] = 2
     return minWidth
 
 def fillWidth(strings, minWidth):
     if minWidth == None:
         return strings
-    newStrings = ['' for i in range(0, len(strings)-1)]
-    for i in range(0,min(len(minWidth),len(strings))-1):
-        newStrings[i] = strings[i]+' ' * (minWidth[i]-len(strings[i]))
+    newStrings = ['' for i in range(0, len(strings))]
+    oversize = 0
+    for i in range(0,len(strings)):
+        newStrings[i] = strings[i]+' ' * (minWidth[i] - len(strings[i]) - oversize)
+        oversize += len(newStrings[i]) - minWidth[i]
     return newStrings
 
 def formatWifi(id, wifi, minWidth = None):
-    return ' | '.join(fillWidth([str(id), wifi.name, wifi.ssid, wifi.location, wifi.comment],minWidth))
+    return '| '.join(fillWidth([str(id), wifi.name, wifi.ssid, wifi.location, wifi.comment],minWidth))
 
 def inputWifi():
     wifiInput = []
