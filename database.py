@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 import csv
 from collections import namedtuple
+import tempfile
+import shutil
 
 fields = ('name','ssid','encryption','passphrase','location','latlong','comment')
 wifiRecord = namedtuple('WifiRecord',fields)
@@ -41,7 +43,17 @@ class DB():
                     writer.writerow((wifi.name, wifi.ssid, wifi.encryption, wifi.passphrase, wifi.location, wifi.latlong, wifi.comment))
     
     def removeItem(self, wifi):
-        pass
+        whash = hash(wifi) # calc hash of wifi
+        with tempfile.SpooledTemporaryFile(mode='w+') as mem:
+            writer = csv.writer(mem)
+            with open(self.path, 'r') as csvfile:
+                reader = csv.reader(csvfile)
+                for data in map(dataRecord._make, reader):
+                    if hash(data) != whash:
+                        writer.writerow((data.name, data.ssid, data.encryption, data.passphrase, data.location, data.latlong, data.comment))
+            mem.seek(0)
+            with open(self.path, 'w') as destfile:
+                shutil.copyfileobj(mem, destfile)
 
 if __name__=='__main__':
     db = DB('list.csv')
