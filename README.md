@@ -5,5 +5,7 @@ usage:
 wifi-manager.py -h shows the help
 
 first step could be
- sudo wifi-manager.py --parse-add /etc/NetworkManager/system-connections/\*
+
+     sudo wifi-manager.py --parse-add /etc/NetworkManager/system-connections/\*
+
 so all wifi networks in your Network-Manager system connections get added
