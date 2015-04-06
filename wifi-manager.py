@@ -6,6 +6,7 @@ import argparse
 import sys
 import parseAdd
 import readline
+#ToDo: Add Verbosity/Question befor removing
 
 def parseArgs():
     parser = argparse.ArgumentParser(description='Manage list of wifi networks')
@@ -54,7 +55,8 @@ def main():
         showInfo(getWifiById(data, args.show))
     if args.remove != None:
         db.removeItem(getWifiById(data, args.remove))
-
+    
+    # ToDo reset filters bevor showing results
     minWidth = getColumnWidth()
     id = 0
     for wifi in data:
