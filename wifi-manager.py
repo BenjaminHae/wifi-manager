@@ -14,7 +14,7 @@ def parseArgs():
     parser.add_argument('--path', action='store', help='use file as database')
     parser.add_argument('--connect', metavar='id', type=int, action='store', help='connect to first network in list')
     parser.add_argument('--add', action='store_true', help='add network')
-    parser.add_argument('--remove', metavar='id', type=int, action='store', help='remove entry id')# ToDo
+    parser.add_argument('--remove', metavar='id', type=int, action='store', help='remove entry id')
     parser.add_argument('--edit', action='store', metavar='id', type=int, help='edit entry')# ToDo
     parser.add_argument('--parse-add', action='store_true', dest='parse', help='add multiple networks by parsing standard input or files')
     parser.add_argument('inputFiles', help='files for parsing', metavar='file', nargs='*', type=str, action='store')
@@ -23,13 +23,13 @@ def parseArgs():
 
 def main():
     args = parseArgs()
-    
     path = 'list.csv'
     if args.path != None:
         path = args.path
     db = database.DB(path)
+    
     if args.add == True:
-        db.addItem(addWifi())
+        db.addItem([inputWifi()])
     if args.parse == True:
         inputFile = args.inputFiles
         if len(inputFile) == 0:
@@ -45,7 +45,9 @@ def main():
     if args.connect != None:
         connect(getWifiById(data, args.connect))
     if args.show != None:
-        showInfo(getWifiById(data,args.show))
+        showInfo(getWifiById(data, args.show))
+    if args.remove != None:
+        db.removeItem(getWifiById(data, args.remove))
 
     minWidth = getColumnWidth()
     id = 0
@@ -71,7 +73,7 @@ def showInfo(wifi):
     for field in wifi._fields:
         print(field + ': ' + getattr(wifi, field))
 
-def getColumnWidth():
+def getColumnWidth():# ToDo use
     minWidth = [15 for i in range(0,5)]
     minWidth[0] = 2
     return minWidth
@@ -87,7 +89,7 @@ def fillWidth(strings, minWidth):
 def formatWifi(id, wifi, minWidth = None):
     return ' | '.join(fillWidth([str(id), wifi.name, wifi.ssid, wifi.location, wifi.comment],minWidth))
 
-def addWifi():
+def inputWifi():
     wifiInput = []
     wifiInput.append(input("Enter connection name: "))
     wifiInput.append(input("SSID: "))
