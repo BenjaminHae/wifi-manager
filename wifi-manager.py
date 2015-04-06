@@ -5,6 +5,7 @@ import network
 import argparse
 import sys
 import parseAdd
+import readline
 
 def parseArgs():
     parser = argparse.ArgumentParser(description='Manage list of wifi networks')
@@ -15,7 +16,7 @@ def parseArgs():
     parser.add_argument('--connect', metavar='id', type=int, action='store', help='connect to first network in list')
     parser.add_argument('--add', action='store_true', help='add network')
     parser.add_argument('--remove', metavar='id', type=int, action='store', help='remove entry id')
-    parser.add_argument('--edit', action='store', metavar='id', type=int, help='edit entry')# ToDo
+    parser.add_argument('--edit', action='store', metavar='id', type=int, help='edit entry')
     parser.add_argument('--parse-add', action='store_true', dest='parse', help='add multiple networks by parsing standard input or files')
     parser.add_argument('inputFiles', help='files for parsing', metavar='file', nargs='*', type=str, action='store')
     args = parser.parse_args()
@@ -42,6 +43,11 @@ def main():
     else:
         data = db.getData()
     
+    if args.edit != None:
+        oldWifi=getWifiById(data, args.edit)
+        newWifi=editInfo(oldWifi)
+        db.removeItem(oldWifi)
+        db.addItem([newWifi])
     if args.connect != None:
         connect(getWifiById(data, args.connect))
     if args.show != None:
@@ -73,6 +79,12 @@ def showInfo(wifi):
     for field in wifi._fields:
         print(field + ': ' + getattr(wifi, field))
 
+def editInfo(wifi):
+    newinfo = []
+    for field in wifi._fields:
+        newinfo.append(rlinput(field + ': ', getattr(wifi, field)))
+    return database.wifiRecord._make(newinfo)
+
 def getColumnWidth():# ToDo use
     minWidth = [15 for i in range(0,5)]
     minWidth[0] = 2
@@ -99,6 +111,13 @@ def inputWifi():
     wifiInput.append("")
     wifiInput.append(input("Comment: "))
     return database.wifiRecord._make(wifiInput)
+
+def rlinput(prompt, prefill=''):
+   readline.set_startup_hook(lambda: readline.insert_text(prefill))
+   try:
+      return input(prompt)
+   finally:
+      readline.set_startup_hook()
 
 def addParse(parse):
     return parseAdd.parseWifi(parse)
