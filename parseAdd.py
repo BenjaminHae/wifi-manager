@@ -12,8 +12,8 @@ def parseWifi(data):
     _security = '802-11-wireless-security'
     try:
         wifiData = [parser.get(_misc,'id'), parser.get(_info,'ssid'), parser.get(_security,'key-mgmt'), parser.get(_security, 'psk'), '', '', '']
-    except:
-        print("couldn't parse", file = sys.stderr)
+    except Exception, e:
+        print("couldn't parse: " + str(e), file = sys.stderr)
         return None
     return database.wifiRecord._make(wifiData)
 
