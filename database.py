@@ -48,7 +48,7 @@ class DB():
             writer = csv.writer(mem)
             with open(self.path, 'r') as csvfile:
                 reader = csv.reader(csvfile)
-                for data in map(dataRecord._make, reader):
+                for data in map(wifiRecord._make, reader):
                     if hash(data) != whash:
                         writer.writerow((data.name, data.ssid, data.encryption, data.passphrase, data.location, data.latlong, data.comment))
             mem.seek(0)
