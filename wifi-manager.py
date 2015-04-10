@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-from curses import wrapper
+#from curses import wrapper
 import database
 import network
 import argparse
@@ -7,19 +7,21 @@ import sys
 import os
 import parseAdd
 import readline
+import barcode
 #ToDo: Add Verbosity/Question befor removing
 
 def parseArgs():
     parser = argparse.ArgumentParser(description='Manage list of wifi networks')
     parser.add_argument('--filter', metavar='expression', action='store', help='search for WIFI network')
-    parser.add_argument('--show', action='store', help='show all information about wifi', metavar='id', type=int)
-    parser.add_argument('--bar', action='store', help='show a barcode to connect', metavar='id', type=int)# ToDo
+    parser.add_argument('--show', action='store_true', help='show all information about wifi')
+    parser.add_argument('--bar', action='store_true', help='show a barcode to connect')
     parser.add_argument('--path', action='store', help='use file as database')
-    parser.add_argument('--connect', metavar='id', type=int, action='store', help='connect to first network in list')
+    parser.add_argument('--connect', action='store_true', help='connect to network')
     parser.add_argument('--add', action='store_true', help='add network')
-    parser.add_argument('--remove', metavar='id', type=int, action='store', help='remove entry id')
-    parser.add_argument('--edit', action='store', metavar='id', type=int, help='edit entry')
+    parser.add_argument('--remove',  action='store_true', help='remove entry id')
+    parser.add_argument('--edit', action='store_true', help='edit entry')
     parser.add_argument('--parse-add', action='store_true', dest='parse', help='add multiple networks by parsing standard input or files')
+    parser.add_argument('id', help='ids for actions', metavar='id', nargs='?', type=int, action='store')
     parser.add_argument('inputFiles', help='files for parsing', metavar='file', nargs='*', type=str, action='store')
     args = parser.parse_args()
     return args
@@ -44,18 +46,27 @@ def main():
         data = db.filteredData(args.filter)
     else:
         data = db.getData()
+
+    id = args.id
+    if id == None and (args.remove == True):
+        parser.error("--remove requires id")
+    elif id == None:
+        id = 1
+    wifi = getWifiById(data,id)
     
-    if args.edit != None:
-        oldWifi=getWifiById(data, args.edit)
+    if args.bar:
+        print(barcode.getBarcode(wifi))
+    if args.show:
+        showInfo(wifi)
+    if args.edit:
+        oldWifi=wifi
         newWifi=editInfo(oldWifi)
         db.removeItem(oldWifi)
         db.addItem([newWifi])
-    if args.connect != None:
-        connect(getWifiById(data, args.connect))
-    if args.show != None:
-        showInfo(getWifiById(data, args.show))
-    if args.remove != None:
-        db.removeItem(getWifiById(data, args.remove))
+    if args.connect:
+        connect(wifi)
+    if args.remove:
+        db.removeItem(wifi)
     
     # ToDo reset filters bevor showing results
     minWidth = getColumnWidth()
