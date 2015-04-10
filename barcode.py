@@ -19,6 +19,7 @@ def encodeInformation(ssid,encryption,psk, hidden=False):
     psk = psk.replace(ch,"\\" + ch)
   return info.format(encryption = encryption, ssid = ssid, psk = psk, hidden = hide)
   
-def getBarcode(ssid, encryption, psk, hidden = False):
-  code = pyqrcode.create(encodeInformation(ssid, encryption, psk, hidden))
-  return code.terminal(module_color='black', background='white')
+def getBarcode(wifi, errorCorrection='L'):
+  hidden = False
+  code = pyqrcode.create(encodeInformation(wifi.ssid, wifi.encryption, wifi.passphrase, hidden), error = errorCorrection)
+  return code.terminal()#module_color='black', background='white')
