@@ -14,6 +14,7 @@ def parseArgs():
     parser = argparse.ArgumentParser(description='Manage list of wifi networks')
     parser.add_argument('--filter', metavar='expression', action='store', help='search for WIFI network')
     parser.add_argument('--show', action='store_true', help='show all information about wifi')
+    parser.add_argument('--s', action='store_true', dest='showShort', help='show short information of wifi')
     parser.add_argument('--bar', action='store_true', help='show a barcode to connect')
     parser.add_argument('--path', action='store', help='use file as database')
     parser.add_argument('--connect', action='store_true', help='connect to network')
@@ -21,7 +22,7 @@ def parseArgs():
     parser.add_argument('--remove',  action='store_true', help='remove entry id')
     parser.add_argument('--edit', action='store_true', help='edit entry')
     parser.add_argument('--parse-add', action='store_true', dest='parse', help='add multiple networks by parsing standard input or files')
-    parser.add_argument('id', help='ids for actions', metavar='id', nargs='?', type=int, action='store')
+    parser.add_argument('id', help='ids for actions', metavar='id', nargs='*', type=int, action='store')
     parser.add_argument('inputFiles', help='files for parsing', metavar='file', nargs='*', type=str, action='store')
     args = parser.parse_args()
     return args
@@ -45,17 +46,19 @@ def main():
     
     data = getData(args.filter, db)
 
-    id = args.id
-    if id == None and (args.remove == True):
+    id = args.id # ToDo multiple IDs
+    if (id == None or len(id) == 0) and (args.remove == True):
         parser.error("--remove requires id")
-    elif id == None:
-        id = 1
-    wifi = getWifiById(data,id)
+    elif id == None or len(id) == 0:
+        id = [1]
+    wifi = getWifiById(data,id[0])
     
+    if args.showShort:
+        print(shortInfo(wifi))
     if args.bar:
         print(barcode.getBarcode(wifi))
     if args.show:
-        showInfo(wifi)
+        print(showInfo(wifi))
     if args.edit:
         oldWifi=wifi
         newWifi=editInfo(oldWifi)
@@ -97,8 +100,14 @@ def connect(wifi):
     network.connectWifi(wifi.ssid, wifi.encryption, wifi.passphrase)
 
 def showInfo(wifi):
+    text = ""
     for field in wifi._fields:
-        print(field + ': ' + getattr(wifi, field))
+        text += (field + ': ' + getattr(wifi, field))+"\r\n"
+    return text
+
+def shortInfo(wifi):
+    text = wifi.name
+    return text
 
 def editInfo(wifi):
     newinfo = []
