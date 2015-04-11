@@ -42,10 +42,8 @@ def main():
         else:
             parse = [open(File) for File in inputFile]
         db.addItem(map(addParse,parse))
-    if args.filter != None:
-        data = db.filteredData(args.filter)
-    else:
-        data = db.getData()
+    
+    data = getData(args.filter, db)
 
     id = args.id
     if id == None and (args.remove == True):
@@ -67,6 +65,8 @@ def main():
         connect(wifi)
     if args.remove:
         db.removeItem(wifi)
+
+    data = getData(args.filter, db)
     
     # ToDo reset filters bevor showing results
     minWidth = getColumnWidth()
@@ -74,6 +74,13 @@ def main():
     for wifi in data:
         id += 1
         print(formatWifi(id, wifi, minWidth))
+        
+def getData(filter, db):
+    if filter != None:
+        return db.filteredData(filter)
+    else:
+        return db.getData()
+
 
 def getWifiById(data, id):
     if id == None:
