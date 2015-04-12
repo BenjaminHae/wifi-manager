@@ -51,7 +51,7 @@ def main():
         parser.error("--remove requires id")
     elif id == None or len(id) == 0:
         id = [1]
-    wifis = [getWifiById(data,id[0])]# ToDo return multiple wifis
+    wifis = getWifiById(data,id)# ToDo return multiple wifis
     
     actions = []
     if args.showShort:
@@ -69,8 +69,8 @@ def main():
     	actions.append(lambda wifi: db.removeItem(wifi))
 
     for wifi in wifis:
-    	for action in actions:
-	    action(wifi)
+        for action in actions:
+            action(wifi)
 
     data = getData(args.filter, db)
     
@@ -90,13 +90,12 @@ def getData(filter, db):
 
 def getWifiById(data, id):
     if id == None:
-        id = 1
+        id = [1]
     count = 0
     for wifi in data:
         count += 1
-        if id == count:
-            return wifi
-    return None
+        if count in id:
+            yield wifi
 
 def connect(wifi):
     print("Connecting to "+ wifi.name)
