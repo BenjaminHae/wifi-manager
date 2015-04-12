@@ -51,23 +51,26 @@ def main():
         parser.error("--remove requires id")
     elif id == None or len(id) == 0:
         id = [1]
-    wifi = getWifiById(data,id[0])
+    wifis = [getWifiById(data,id[0])]# ToDo return multiple wifis
     
+    actions = []
     if args.showShort:
-        print(shortInfo(wifi))
+        actions.append(lambda wifi: print(shortInfo(wifi)))
     if args.bar:
-        print(barcode.getBarcode(wifi))
+        actions.append(lambda wifi: print(barcode.getBarcode(wifi)))
     if args.show:
-        print(showInfo(wifi))
+        actions.append(lambda wifi: print(showInfo(wifi)))
     if args.edit:
-        oldWifi=wifi
-        newWifi=editInfo(oldWifi)
-        db.removeItem(oldWifi)
-        db.addItem([newWifi])
+    	actions.append(lambda wifi: replaceEdit(db, wifi))
+        
     if args.connect:
-        connect(wifi)
+        connect(wifis[0]) # for obvious reasons connect to only one wifi
     if args.remove:
-        db.removeItem(wifi)
+    	actions.append(lambda wifi: db.removeItem(wifi))
+
+    for wifi in wifis:
+    	for action in actions:
+	    action(wifi)
 
     data = getData(args.filter, db)
     
@@ -114,6 +117,12 @@ def editInfo(wifi):
     for field in wifi._fields:
         newinfo.append(rlinput(field + ': ', getattr(wifi, field)))
     return database.wifiRecord._make(newinfo)
+
+def replaceEdit(db, wifi):
+    oldWifi=wifi
+    newWifi=editInfo(oldWifi)
+    db.removeItem(oldWifi)
+    db.addItem([newWifi])
 
 def getColumnWidth():# ToDo use
     rows, columns = map(int,os.popen('stty size', 'r').read().split())
