@@ -46,12 +46,12 @@ def main():
     
     data = getData(args.filter, db)
 
-    id = args.id # ToDo multiple IDs
+    id = args.id
     if (id == None or len(id) == 0) and (args.remove == True):
         parser.error("--remove requires id")
     elif id == None or len(id) == 0:
         id = [1]
-    wifis = getWifiById(data,id)# ToDo return multiple wifis
+    wifis = getWifiById(data,id)
     
     actions = []
     if args.showShort:
