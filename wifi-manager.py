@@ -43,6 +43,7 @@ def main():
             parse = [sys.stdin]
         else:
             parse = [open(File) for File in inputFile]
+        parse = [wifi for wifi in parse if db.checkIfExists(wifi.ssid, wifi.encryption, wifi.passphrase)]
         db.addItem(map(addParse,parse))
     
     data = getData(args.filter, db)
