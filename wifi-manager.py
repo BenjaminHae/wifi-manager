@@ -22,9 +22,8 @@ def parseArgs():
     parser.add_argument('--add', action='store_true', help='add network')
     parser.add_argument('--remove',  action='store_true', help='remove entry id')
     parser.add_argument('--edit', action='store_true', help='edit entry')
-    parser.add_argument('--parse-add', action='store_true', dest='parse', help='add multiple networks by parsing standard input or files')
     parser.add_argument('id', help='ids for actions', metavar='id', nargs='*', type=int, action='store')
-    parser.add_argument('inputFiles', help='files for parsing', metavar='file', nargs='*', type=str, action='store')
+    parser.add_argument('--parse-add', action='store', dest='parse', nargs='*', metavar='file', type=str, help='add multiple networks by parsing standard input or files')
     args = parser.parse_args()
     return args
 
@@ -37,14 +36,15 @@ def main():
     
     if args.add == True:
         db.addItem([inputWifi()])
-    if args.parse == True:
-        inputFile = args.inputFiles
+    if args.parse != None:
+        inputFile = args.parse
         if len(inputFile) == 0:
             parse = [sys.stdin]
         else:
             parse = [open(File) for File in inputFile]
-        parse = [wifi for wifi in parse if db.checkIfExists(wifi.ssid, wifi.encryption, wifi.passphrase)]
-        db.addItem(map(addParse,parse))
+        parse = map(addParse, parse)
+        parse = [wifi for wifi in parse if not db.checkIfExists(wifi.ssid, wifi.encryption, wifi.passphrase)]
+        db.addItem(parse)
     
     data = getData(args.filter, db)
 
