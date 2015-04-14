@@ -35,6 +35,14 @@ class DB():
             if wifiRecordContains(wifi, expression):
                 yield wifi
 
+    def checkIfExists(self, ssid, encryption, passphrase):
+        with open(self.path,'r') as csvfile:
+            reader = csv.reader(csvfile)
+            for wifi in reader:
+                if wifi.ssid == ssid and wifi.encryption == encryption and wifi.passphrase == passphrase:
+                    return true
+        return False
+
     def addItem(self, data):
         with open(self.path, 'a') as csvfile:
             writer = csv.writer(csvfile)
