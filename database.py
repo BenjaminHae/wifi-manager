@@ -38,9 +38,9 @@ class DB():
     def checkIfExists(self, ssid, encryption, passphrase):
         with open(self.path,'r') as csvfile:
             reader = csv.reader(csvfile)
-            for wifi in reader:
+            for wifi in map(wifiRecord._make, reader):
                 if wifi.ssid == ssid and wifi.encryption == encryption and wifi.passphrase == passphrase:
-                    return true
+                    return True
         return False
 
     def addItem(self, data):
