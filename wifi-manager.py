@@ -9,6 +9,7 @@ import parseAdd
 import readline
 import barcode
 #ToDo: Add Verbosity/Question befor removing
+#ToDo: Check for duplicates when adding(SSID, encr, passphr)
 
 def parseArgs():
     parser = argparse.ArgumentParser(description='Manage list of wifi networks')
