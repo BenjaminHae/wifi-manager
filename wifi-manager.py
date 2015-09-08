@@ -66,7 +66,7 @@ def main():
     	actions.append(lambda wifi: replaceEdit(db, wifi))
         
     if args.connect:
-        connect(wifis[0]) # for obvious reasons connect to only one wifi
+        connect(next(wifis)) # for obvious reasons connect to only one wifi
     if args.remove:
     	actions.append(lambda wifi: db.removeItem(wifi))
 
