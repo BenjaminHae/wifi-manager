@@ -70,7 +70,7 @@ def main():
 
     for wifi in wifis:
     	for action in actions:
-	    action(wifi)
+            action(wifi)
 
     data = getData(args.filter, db)
     
