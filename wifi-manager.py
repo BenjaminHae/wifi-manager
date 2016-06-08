@@ -9,6 +9,7 @@ import parseAdd
 import readline
 import barcode
 #ToDo: Add Verbosity/Question befor removing
+#ToDo: Check for duplicates when adding(SSID, encr, passphr)
 
 def parseArgs():
     parser = argparse.ArgumentParser(description='Manage list of wifi networks')
@@ -21,9 +22,8 @@ def parseArgs():
     parser.add_argument('--add', action='store_true', help='add network')
     parser.add_argument('--remove',  action='store_true', help='remove entry id')
     parser.add_argument('--edit', action='store_true', help='edit entry')
-    parser.add_argument('--parse-add', action='store_true', dest='parse', help='add multiple networks by parsing standard input or files')
     parser.add_argument('id', help='ids for actions', metavar='id', nargs='*', type=int, action='store')
-    parser.add_argument('inputFiles', help='files for parsing', metavar='file', nargs='*', type=str, action='store')
+    parser.add_argument('--parse-add', action='store', dest='parse', nargs='*', metavar='file', type=str, help='add multiple networks by parsing standard input or files')
     args = parser.parse_args()
     return args
 
@@ -36,22 +36,24 @@ def main():
     
     if args.add == True:
         db.addItem([inputWifi()])
-    if args.parse == True:
-        inputFile = args.inputFiles
+    if args.parse != None:
+        inputFile = args.parse
         if len(inputFile) == 0:
             parse = [sys.stdin]
         else:
             parse = [open(File) for File in inputFile]
-        db.addItem(map(addParse,parse))
+        parse = map(addParse, parse)
+        parse = [wifi for wifi in parse if not db.checkIfExists(wifi.ssid, wifi.encryption, wifi.passphrase)]
+        db.addItem(parse)
     
     data = getData(args.filter, db)
 
-    id = args.id # ToDo multiple IDs
+    id = args.id
     if (id == None or len(id) == 0) and (args.remove == True):
         parser.error("--remove requires id")
     elif id == None or len(id) == 0:
         id = [1]
-    wifis = [getWifiById(data,id[0])]# ToDo return multiple wifis
+    wifis = getWifiById(data,id)
     
     actions = []
     if args.showShort:
@@ -64,12 +66,12 @@ def main():
     	actions.append(lambda wifi: replaceEdit(db, wifi))
         
     if args.connect:
-        connect(wifis[0]) # for obvious reasons connect to only one wifi
+        connect(next(wifis)) # for obvious reasons connect to only one wifi
     if args.remove:
     	actions.append(lambda wifi: db.removeItem(wifi))
 
     for wifi in wifis:
-    	for action in actions:
+        for action in actions:
             action(wifi)
 
     data = getData(args.filter, db)
@@ -90,13 +92,12 @@ def getData(filter, db):
 
 def getWifiById(data, id):
     if id == None:
-        id = 1
+        id = [1]
     count = 0
     for wifi in data:
         count += 1
-        if id == count:
-            return wifi
-    return None
+        if count in id:
+            yield wifi
 
 def connect(wifi):
     print("Connecting to "+ wifi.name)
